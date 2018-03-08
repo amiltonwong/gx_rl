@@ -1,0 +1,119 @@
+import numpy as np
+import random
+import os
+import pygame
+import time
+import matplotlib.pyplot as plt
+from yuanyang_env import *
+from yuanyang_env import YuanYangEnv
+
+class Td_Sarsa:
+    def __init__(self, yuanyang):
+        self.gamma = yuanyang.gamma
+        self.yuanyang = yuanyang
+        #值函数的初始值
+        self.qvalue=np.zeros((len(self.yuanyang.states),len(self.yuanyang.actions)))
+    #定义贪婪策略
+    def greedy_policy(self, qfun, state):
+        amax=qfun[state,:].argmax()
+        return self.yuanyang.actions[amax]
+    #定义epsilon贪婪策略
+    def epsilon_greedy_policy(self, qfun, state, epsilon):
+        amax = qfun[state, :].argmax()
+        # 概率部分
+        if np.random.uniform() < 1 - epsilon:
+            # 最优动作
+            return self.yuanyang.actions[amax]
+        else:
+            return self.yuanyang.actions[int(random.random() * len(self.yuanyang.actions))]
+    #找到动作所对应的序号
+    def find_anum(self,a):
+        for i in range(len(self.yuanyang.actions)):
+            if a==self.yuanyang.actions[i]:
+                return i
+
+    def sarsa(self, num_iter, alpha, epsilon):
+        #第一个大循环，产生了多少次实验
+        for iter in range(num_iter):
+            #随机初始化状态
+            epsilon = epsilon*0.99
+            #初始状态，s0,
+            s = self.yuanyang.reset()
+            #随机选初始动作
+            # a = self.yuanyang.actions[int(random.random()*len(self.yuanyang.actions))]
+            a = self.epsilon_greedy_policy(self.qvalue, s, epsilon)
+            t = False
+            count = 0
+            #第二个循环，一个实验，s0-s1-s2-s1-s2-s_terminate
+            while False==t and count < 30:
+                #与环境交互得到下一个状态
+                s_next, r, t = self.yuanyang.transform(s, a)
+                a_num = self.find_anum(a)
+                #判断一下 是否是终止状态
+                if t == True:
+                    q_target = r
+                else:
+                    # 下一个状态处的最大动作,这个地方体现on-policy
+                    a1 = self.epsilon_greedy_policy(self.qvalue, s_next, epsilon)
+                    a1_num = self.find_anum(a1)
+                    # qlearning的更新公式
+                    q_target = r + self.gamma * self.qvalue[s_next, a1_num]
+                    # 利用td方法更新动作值函数，alpha
+                self.qvalue[s, a_num] = self.qvalue[s, a_num] + alpha * (q_target - self.qvalue[s, a_num])
+                # YuanYangEnv2.bird_male_position = YuanYangEnv2.state_to_position(s)
+                # YuanYangEnv2.render()
+                # time.sleep(1)
+                # 转到下一个状态
+                s = s_next
+                #行为策略
+                a = self.epsilon_greedy_policy(self.qvalue, s, epsilon)
+                count += 1
+        return self.qvalue
+if __name__=="__main__":
+    yuanyang = YuanYangEnv()
+    agent = Td_Sarsa(yuanyang)
+    qvalue=agent.sarsa(num_iter=5000, alpha=0.1, epsilon=0.8)
+    #打印学到的值函数
+    print(qvalue)
+    ##########################################
+    #测试学到的策略
+    flag = 1
+    #靠近目标点
+    s = 57
+    # print(policy_value.pi)
+    step_num = 0
+    # 将最优路径打印出来
+    while flag:
+        a = agent.greedy_policy(qvalue,s)
+        print('%d->%s\t' % (s, a))
+        yuanyang.bird_male_position = yuanyang.state_to_position(s)
+        yuanyang.render()
+        time.sleep(0.2)
+        step_num += 1
+        s_, r, t = yuanyang.transform(s, a)
+        if t == True or step_num > 200:
+            flag = 0
+        s = s_
+    # print('optimal policy is \t')
+    # print(policy_value.pi)
+    # print('optimal value function is \t')
+    # print(policy_value.v)
+    # xx = np.linspace(0, len(policy_value.v) - 1, 101)
+    # yy = policy_value.v
+    # plt.figure()
+    # plt.plot(xx, yy)
+    # plt.show()
+    # # 将值函数的图像显示出来
+    # z = []
+    # for i in range(100):
+    #     z.append(1000 * policy_value.v[i])
+    # zz = np.array(z).reshape(10, 10)
+    # plt.figure(num=2)
+    # plt.imshow(zz, interpolation='none')
+    # plt.show()
+
+
+
+
+        
+
