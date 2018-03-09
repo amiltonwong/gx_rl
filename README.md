@@ -6,3 +6,4 @@ tf1.1
 
 Used packages:
 tf 1.1 (python3.6)
+pygame

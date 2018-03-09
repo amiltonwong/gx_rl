@@ -10,7 +10,10 @@ class Policy_Value:
     def __init__(self, yuanyang):
         self.states = yuanyang.states
         self.actions = yuanyang.actions
+        # initialize value functions
         self.v = [0.0 for i in range(len(self.states)+1)]
+        # Policy: given state, the distribution over actions
+        # use dictionary to store policy, key is state, value is action
         self.pi = dict()
         self.yuanyang = yuanyang
         self.gamma = yuanyang.gamma
@@ -21,6 +24,7 @@ class Policy_Value:
             flag1=yuanyang.collide(yuanyang.state_to_position(state))
             flag2=yuanyang.find(yuanyang.state_to_position(state))
             if flag1==1 or flag2==1: continue
+            # 策略 隨机初始化
             self.pi[state] = self.actions[int(random.random()*len(self.actions))]
             #print(self.pi)
 
