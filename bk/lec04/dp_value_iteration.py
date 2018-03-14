@@ -35,7 +35,7 @@ class Policy_Value:
                 # yuanyang.bird_male_position = yuanyang.state_to_position(state)
                 # yuanyang.render()
                 s, r, t = yuanyang.transform( state, a1 )
-                #策略评估
+                #策略评估, 只執行一步
                 v1 = r + self.gamma * self.v[s]
                 #策略改进
                 for action in self.actions:
@@ -47,6 +47,7 @@ class Policy_Value:
                 self.pi[state] = a1
                 self.v[state]  = v1
             if delta <  1e-6:
+                print(i)
                 break
 
 

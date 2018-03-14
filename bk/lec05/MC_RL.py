@@ -17,10 +17,12 @@ class MC_RL:
         # self.gamma = 0.90
         self.learn_num = 0
 
+    # 需要改善的策略pi為贪婪策略
     # 定义贪婪策略
     def greedy_policy(self, qfun, state):
         amax = qfun[state, :].argmax()
         return self.actions[amax]
+    # 行為策略mu為e-greedy策略
     #定义e-贪婪策略,蒙特卡罗方法，要评估的策略时e-greedy策略，产生数据的策略。
     def epsilon_greedy_policy(self, qfun, state, epsilon):
         amax = qfun[state, :].argmax()
@@ -48,9 +50,11 @@ class MC_RL:
             s = self.yuanyang.reset()
             t = False
             step_num = 0
+
             #采集数据s0-a1-s1-a2-s2...terminate state
             #for i in range(5):
             while False == t or step_num < 30:
+                # 使用e-greedy策略采集數据
                 a = self.epsilon_greedy_policy(self.qvalue, s, epsilon)
                 #与环境交互
                 s_next, r, t = self.yuanyang.transform(s, a)
@@ -87,12 +91,13 @@ if __name__=="__main__":
     ##########################################
     #测试学到的策略
     flag = 1
-    s = 2
+    s = 11#57 # 2
     # print(policy_value.pi)
     step_num = 0
     # 将最优路径打印出来
     while flag:
-        a = agent.greedy_policy(qvalue,s)
+        #a = agent.greedy_policy(qvalue,s)
+        a = agent.epsilon_greedy_policy(qvalue, s, 0.01)
         print('%d->%s\t' % (s, a))
         yuanyang.bird_male_position = yuanyang.state_to_position(s)
         yuanyang.render()

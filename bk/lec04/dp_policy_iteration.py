@@ -68,21 +68,27 @@ class Policy_Value:
                 #更新值替换原来的值函数
                 self.v[state] = new_v
             if delta < 1e-6:
+                print(i)
                 break
 
     def policy_iterate(self):
         for i in range(100):
-            #策略评估,变的时v
+            #策略评估,变的时v, 算当前策略pi所对应的值函數
             self.policy_evaluate()
             #策略改进
             #变的是pi
+            # 用当前的值函數，取greedy policy作為新的policy
             self.policy_improve()
+            # 得到新的policy pi
 
 
 if __name__ == "__main__":
+    # 实例化一个环境
     yuanyang = YuanYangEnv()
+    # 实例化一个策略值Policy value
     policy_value = Policy_Value(yuanyang)
     policy_value.policy_iterate()
+    #調用了上面函數后，得到更新了的policy_value.v, policy_value.pi, and they are already "optimal"
     flag=1
     s=0
     # print(policy_value.pi)
@@ -95,6 +101,7 @@ if __name__ == "__main__":
         yuanyang.render()
         time.sleep(0.2)
         step_num+=1
+        #对环境进行交互
         s_,r,t=yuanyang.transform(s,a)
         if t==True or step_num>20:
             flag=0

@@ -40,8 +40,8 @@ class Td_Sarsa:
             #初始状态，s0,
             s = self.yuanyang.reset()
             #随机选初始动作
-            # a = self.yuanyang.actions[int(random.random()*len(self.yuanyang.actions))]
-            a = self.epsilon_greedy_policy(self.qvalue, s, epsilon)
+            a = self.yuanyang.actions[int(random.random()*len(self.yuanyang.actions))]
+            #a = self.epsilon_greedy_policy(self.qvalue, s, epsilon)
             t = False
             count = 0
             #第二个循环，一个实验，s0-s1-s2-s1-s2-s_terminate
@@ -79,7 +79,9 @@ if __name__=="__main__":
     #测试学到的策略
     flag = 1
     #靠近目标点
-    s = 57
+    #s = 57
+    # 从左上角开始
+    s = 0
     # print(policy_value.pi)
     step_num = 0
     # 将最优路径打印出来
